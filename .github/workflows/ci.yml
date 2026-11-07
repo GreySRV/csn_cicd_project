@@ -59,3 +59,24 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:sha-${{ env.SHORT_SHA }}
             ${{ env.IMAGE }}:latest
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: [self-hosted, control]
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to nodes
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          IMAGE="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/csn-app:sha-${GITHUB_SHA::7}"
+          if [[ "$COMMIT_MSG" == *"[break-health]"* ]]; then
+            echo "Fault injection: starting containers with broken /health"
+            export FAIL_HEALTH=1
+          fi
+          bash deploy/deploy.sh "$IMAGE"
