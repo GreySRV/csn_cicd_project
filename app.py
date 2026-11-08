@@ -13,7 +13,7 @@ def node_name():
 @app.route("/")
 def index():
     return jsonify(
-        message="Hello from CSN CI/CD project",
+        message="Hello from CSN CI/CD project v2",
         version=os.environ.get("APP_VERSION", "dev"),
         node=node_name(),
     )
