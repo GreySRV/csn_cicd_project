@@ -25,7 +25,7 @@ def test_health_ok(monkeypatch):
     monkeypatch.delenv("FAIL_HEALTH", raising=False)
     resp = app.test_client().get("/health")
     assert resp.status_code == 200
-    assert resp.get_json()["status"] == "broken"
+    assert resp.get_json()["status"] == "ok"
 
 
 def test_health_fails_when_flag_set(monkeypatch):
